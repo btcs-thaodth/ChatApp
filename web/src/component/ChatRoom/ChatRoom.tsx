@@ -13,7 +13,7 @@ interface Message{
 const ChatRoom = () => {
     const [messages, setMessage] = useState<Message[]>([])
     useEffect(() => {
-        socket.on('msgToClient', ( data ) => {
+        const messageListener = (data: any) => {
             setMessage((prev)=> {
                 return[
                     ...prev,
@@ -24,8 +24,13 @@ const ChatRoom = () => {
                     }
                 ];
             })
-        }) 
-    },[])
+        };
+        socket.on('msgToClient', messageListener);
+    
+        return () => {
+          socket.off('msgToClient', messageListener);
+        };
+    }, []);
     return (
         <div>
            <Header title="Chat Room"></Header>
