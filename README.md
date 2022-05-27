@@ -1,13 +1,19 @@
 # ChatApp
 
-- open terminal 1
+git clone https://github.com/btcs-thaodth/ChatApp.git
 
-B1: cd server
+- Backend: open terminal 1
 
-B2: yarn start
+    B1: cd server
 
-- open terminal 2
+    B2: yarn install
 
-B1: cd web
+    B3: yarn start
 
-B2: yarn start
+- Frontend: open terminal 2
+
+    B1: cd web
+
+    B2: yarn install
+
+    B3: yarn start
