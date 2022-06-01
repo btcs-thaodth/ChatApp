@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react"
+import { socketOff, socketOn } from "../../server/chatapp"
 import Header from "../Header"
 import InputMess from "./InputMess"
 import MessageList from "./MessageList"
-import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001/")
 interface Message{
     id: string,
     user: string,
-    message: string
+    message: string,
+    label: string
 }
 const ChatRoom = () => {
     const [messages, setMessage] = useState<Message[]>([])
@@ -20,17 +20,62 @@ const ChatRoom = () => {
                     {
                         id: data.data.id,
                         user: data.data.user,
-                        message: data.data.message
+                        message: data.data.message,
+                        label: 'message'
                     }
                 ];
             })
         };
-        socket.on('msgToClient', messageListener);
+        socketOn('msgToClient', messageListener)
     
         return () => {
-          socket.off('msgToClient', messageListener);
+            socketOff('msgToClient', messageListener);
         };
     }, []);
+
+    useEffect(() => {
+        const loginListener = (data: any) => {
+            setMessage((prev)=> {
+                return[
+                    ...prev,
+                    {
+                        id: data.data.id,
+                        user: data.data.user,
+                        message: 'joined the chat room',
+                        label: 'connected'
+                    }
+                ];
+            })
+        };
+        socketOn('connectionToClient', loginListener)
+    
+        return () => {
+            socketOff('connectionToClient', loginListener);
+        };
+    }, []);
+
+    useEffect(() => {
+        const logoutListener = (data: any) => {
+            setMessage((prev)=> {
+                return[
+                    ...prev,
+                    {
+                        id: data.data.id,
+                        user: data.data.user,
+                        message: 'has left the chat room',
+                        label: 'disconnected'
+                    }
+                ];
+            })
+        };
+        socketOn('disconnectedToClient', logoutListener)
+    
+        return () => {
+            socketOff('disconnectedToClient', logoutListener);
+        };
+    }, []);
+
+
     return (
         <div>
            <Header title="Chat Room"></Header>

@@ -2,13 +2,15 @@ import { Form, Input, Button } from 'antd';
 import { useRecoilState } from 'recoil';
 import { currentUserStore } from '../../store/CurrentUser';
 import { useNavigate } from 'react-router-dom';
+import { handleLoginLogout } from '../../server/chatapp';
+import { v4 as uuid } from 'uuid';
 
 const Login = () => {
     const navigate = useNavigate();
     const [ , setCurrentUser] = useRecoilState(currentUserStore)
     const onFinish = (values: any) => {
-        console.log('aaa', values);
         setCurrentUser(values.username);
+        handleLoginLogout('connectionToServer',uuid(), values.username);
         navigate('/chatroom');
     };
 
