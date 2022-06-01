@@ -16,7 +16,6 @@ const HomePage = () => {
             <div className="h-full place-items-center">
                 <ChatRoom />
             </div>
-
         </LayoutPage>
         </>
     );

@@ -4,7 +4,7 @@ let url = ''
 if(process.env.REACT_APP_SERVER){
     url = process.env.REACT_APP_SERVER
 }
-
+console.log('aaaa', url)
 const socket = io(url)
 
 export function sendInputMess(id: string, message: string, user?: string){

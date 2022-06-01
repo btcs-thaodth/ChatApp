@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
+import { useRecoilState } from "recoil"
 import { socketOff, socketOn } from "../../server/chatapp"
+import { listUserStore } from "../../store/ListUser"
 import Header from "../Header"
 import InputMess from "./InputMess"
 import MessageList from "./MessageList"
@@ -12,6 +14,8 @@ interface Message{
 }
 const ChatRoom = () => {
     const [messages, setMessage] = useState<Message[]>([])
+    const [ , setListUser] = useRecoilState(listUserStore)
+    console.log('aaaa', messages)
     useEffect(() => {
         const messageListener = (data: any) => {
             setMessage((prev)=> {
@@ -46,13 +50,19 @@ const ChatRoom = () => {
                     }
                 ];
             })
+            setListUser((prev) => {
+                return[
+                  ...prev,
+                  data.data.user
+                ]
+              })
         };
         socketOn('connectionToClient', loginListener)
     
         return () => {
             socketOff('connectionToClient', loginListener);
         };
-    }, []);
+    }, [setListUser]);
 
     useEffect(() => {
         const logoutListener = (data: any) => {
