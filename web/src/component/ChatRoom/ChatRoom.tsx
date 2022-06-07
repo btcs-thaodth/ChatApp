@@ -1,55 +1,36 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect } from "react"
 import { useRecoilState } from "recoil"
-import { socketOff, socketOn } from "../../server/chatapp"
+import { socketOff, socketOn } from "../../service/chatapp"
+import messageApi from "../../service/messageApi"
 import { listUserStore } from "../../store/ListUser"
+import { messageStore } from "../../store/Message"
 import Header from "../Header"
 import InputMess from "./InputMess"
 import MessageList from "./MessageList"
 
-interface Message{
-    id: string,
-    user: string,
-    message: string,
-    label: string
-}
 const ChatRoom = () => {
-    const [messages, setMessage] = useState<Message[]>([])
-    const [ , setListUser] = useRecoilState(listUserStore)
-    console.log('aaaa', messages)
+    const [messages, setMessage] = useRecoilState(messageStore)
+    const [ listUser, setListUser] = useRecoilState(listUserStore)
+    const messageListener = useCallback(async() => {
+        try {
+            const mess = await messageApi.getAllMessages()
+            setMessage([...mess.data])
+        } catch {
+            //TODO: handle get all member fail
+        }
+    },[setMessage]);
     useEffect(() => {
-        const messageListener = (data: any) => {
-            setMessage((prev)=> {
-                return[
-                    ...prev,
-                    {
-                        id: data.data.id,
-                        user: data.data.user,
-                        message: data.data.message,
-                        label: 'message'
-                    }
-                ];
-            })
-        };
+        
         socketOn('msgToClient', messageListener)
     
         return () => {
             socketOff('msgToClient', messageListener);
         };
-    }, []);
+    }, [messageListener]);
 
     useEffect(() => {
         const loginListener = (data: any) => {
-            setMessage((prev)=> {
-                return[
-                    ...prev,
-                    {
-                        id: data.data.id,
-                        user: data.data.user,
-                        message: 'joined the chat room',
-                        label: 'connected'
-                    }
-                ];
-            })
+            messageListener()
             setListUser((prev) => {
                 return[
                   ...prev,
@@ -62,28 +43,20 @@ const ChatRoom = () => {
         return () => {
             socketOff('connectionToClient', loginListener);
         };
-    }, [setListUser]);
+    }, [setListUser, messageListener]);
 
     useEffect(() => {
         const logoutListener = (data: any) => {
-            setMessage((prev)=> {
-                return[
-                    ...prev,
-                    {
-                        id: data.data.id,
-                        user: data.data.user,
-                        message: 'has left the chat room',
-                        label: 'disconnected'
-                    }
-                ];
-            })
+            const user = listUser.filter((item) => item !== (data.data.user))
+            setListUser([...user])
+            messageListener()
         };
         socketOn('disconnectedToClient', logoutListener)
     
         return () => {
             socketOff('disconnectedToClient', logoutListener);
         };
-    }, []);
+    }, [setListUser, listUser, messageListener]);
 
 
     return (

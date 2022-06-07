@@ -1,5 +1,4 @@
-import { handleLoginLogout } from '../../server/chatapp';
-import { v4 as uuid } from 'uuid';
+import { handleLoginLogout } from '../../service/chatapp';
 import { useRecoilState } from 'recoil';
 import { currentUserStore } from '../../store/CurrentUser';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ const Header = ({title}: Props) => {
     const navigate = useNavigate();
     const [currentUser] = useRecoilState(currentUserStore)
     const handleDisconnect = () => {
-        handleLoginLogout('disconnectedToServer',uuid(), currentUser);
+        handleLoginLogout('disconnectedToServer', 'has left the chat room', currentUser, 'disconnected');
         navigate('/');
     }
     return(

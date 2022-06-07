@@ -2,8 +2,7 @@ import { Button } from "antd";
 import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { currentUserStore } from "../../store/CurrentUser";
-import { v4 as uuid } from 'uuid';
-import { sendInputMess } from "../../server/chatapp";
+import { sendInputMess } from "../../service/chatapp";
 
 const InputMess = () => {
     const [currentUser] = useRecoilState(currentUserStore)
@@ -12,7 +11,7 @@ const InputMess = () => {
         setMessage(event.target.value);
     }
     const handleSubmitMess = () => {
-        sendInputMess(uuid(),message,currentUser)
+        sendInputMess(message,currentUser)
         setMessage('')
     }
     const sendMessOn = (event: any) => {

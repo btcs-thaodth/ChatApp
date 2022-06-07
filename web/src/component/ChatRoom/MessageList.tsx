@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Message } from '../../models/Message';
 import MessageItem from "./MessageItem";
 import Notify from './Notify';
 interface Props{
-    messages: any,
+    messages: Message[],
 }
 const MessageList = ({messages} :Props) => {
+    const messageEndRef = useRef<HTMLDivElement>(null)
+    useEffect(() => {
+        messageEndRef.current?.scrollIntoView();
+    },[messages])
     return (
         <ul>
-            {messages.map((item:any) => (
+            {messages.map((item:Message) => (
                 <div key={item.id} >
                 {item.label === 'message' ? (
                     <div className="grid grid-cols-3 gap-4">
-                    <MessageItem user={item.user} message={item.message}></MessageItem>
+                    <MessageItem user={item.user} message={item.message} time={item.createdAt}></MessageItem>
                 </div>
                 ): (
                     <div className="flex justify-center items-center">
@@ -20,7 +25,7 @@ const MessageList = ({messages} :Props) => {
                 )}
                 </div>
             ))}
-            
+            <div ref={messageEndRef}></div>
         </ul>
     )
 }

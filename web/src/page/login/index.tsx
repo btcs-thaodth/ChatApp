@@ -2,21 +2,37 @@ import { Form, Input, Button } from 'antd';
 import { useRecoilState } from 'recoil';
 import { currentUserStore } from '../../store/CurrentUser';
 import { useNavigate } from 'react-router-dom';
-import { handleLoginLogout } from '../../server/chatapp';
-import { v4 as uuid } from 'uuid';
+import { handleLoginLogout } from '../../service/chatapp';
+import { useEffect } from 'react';
+import messageApi from '../../service/messageApi';
+import { messageStore } from '../../store/Message';
 
 const Login = () => {
     const navigate = useNavigate();
     const [ , setCurrentUser] = useRecoilState(currentUserStore)
-    const onFinish = (values: any) => {
+    const [ , setMessage] = useRecoilState(messageStore)
+    const onFinish = async(values: any) => {
         setCurrentUser(values.username);
-        handleLoginLogout('connectionToServer',uuid(), values.username);
+        handleLoginLogout('connectionToServer','joined the chat room', values.username, 'connected');
         navigate('/chatroom');
     };
 
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
     };
+    useEffect(() => {
+      const getAllMessages = async() => {
+        try {
+          const mess = await messageApi.getAllMessages()
+          setMessage([...mess.data])
+        } catch {
+          //TODO: handle get all member fail
+        }
+      }
+      getAllMessages()
+    },[setMessage])
+
+    
     return(
         <div
         className="w-full h-[100vh] grid place-items-center"
