@@ -26,6 +26,18 @@ export class AppGateway
     this.server.emit('msgToClient', { data: payload });
   }
 
+  @SubscribeMessage('connectionToServer')
+  handleLogin(client: Socket, payload: any): void {
+    this.logger.log('connection', payload);
+    this.server.emit('connectionToClient', { data: payload });
+  }
+
+  @SubscribeMessage('disconnectedToServer')
+  handleLoout(client: Socket, payload: any): void {
+    this.logger.log('disconnected', payload);
+    this.server.emit('disconnectedToClient', { data: payload });
+  }
+
   afterInit() {
     this.logger.log('Init');
   }
